@@ -5,13 +5,23 @@
     "completed": true
   },
   {
-    "id": "1376f3f3-55a0-493c-bf70-17dc6f99bbee",
-    "title": "new",
+    "id": "1",
+    "title": "Buy groceries",
     "completed": false
   },
   {
-    "id": "a897d2ab-d7d2-4d11-abec-4c7acf7abff0",
-    "title": "New title",
+    "id": "2",
+    "title": "Do laundry",
+    "completed": false
+  },
+  {
+    "id": "d2f82619-1e2e-45be-b6e5-7b992311e6f3",
+    "title": "Do react homework ",
+    "completed": false
+  },
+  {
+    "id": "1a4180ea-6ba1-4378-976b-774f86365b37",
+    "title": "Do node practice",
     "completed": false
   }
 ]
