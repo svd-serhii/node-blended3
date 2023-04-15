@@ -6,53 +6,43 @@ const {
   deleteTaskService,
 } = require("../services/tasksServices");
 
-const getTasks = async (req, res, next) => {
-  try {
-    const tasks = await getTasksService();
-    res.status(200).json(tasks);
-  } catch (error) {
-    next(error);
-  }
+const { catchAsync } = require("../utils/catchAsync");
+
+let getTasks = async (req, res) => {
+  const tasks = await getTasksService();
+  res.status(200).json(tasks);
 };
 
-const getTask = async (req, res, next) => {
-  try {
-    const { taskId } = req.params;
-    const task = await getTaskService(taskId);
-    res.status(200).json(task);
-  } catch (error) {
-    next(error);
-  }
+getTasks = catchAsync(getTasks);
+
+let getTask = catchAsync(async (req, res) => {
+  const { taskId } = req.params;
+  const task = await getTaskService(taskId);
+  res.status(200).json(task);
+});
+
+let createTask = async (req, res, next) => {
+  const createTask = await createTaskService(req.body);
+  res.status(201).json(createTask);
 };
 
-const createTask = async (req, res, next) => {
-  try {
-    const createTask = await createTaskService(req.body);
-    res.status(201).json(createTask);
-  } catch (error) {
-    next(error);
-  }
+createTask = catchAsync(createTask);
+
+let updateTask = async (req, res, next) => {
+  const { taskId } = req.params;
+  const updatedTask = await updateTaskService(taskId, req.body);
+  res.status(200).json(updatedTask);
 };
 
-const updateTask = async (req, res, next) => {
-  try {
-    const { taskId } = req.params;
-    const updatedTask = await updateTaskService(taskId, req.body);
-    res.status(200).json(updatedTask);
-  } catch (error) {
-    next(error);
-  }
+updateTask = catchAsync(updateTask);
+
+let deleteTask = async (req, res, next) => {
+  const { taskId } = req.params;
+  const deletedTaskId = await deleteTaskService(taskId);
+  res.status(200).json({ id: taskId });
 };
 
-const deleteTask = async (req, res, next) => {
-  try {
-    const { taskId } = req.params;
-    const deletedTaskId = await deleteTaskService(taskId);
-    res.status(200).json({ id: taskId });
-  } catch (error) {
-    next(error);
-  }
-};
+deleteTask = catchAsync(deleteTask);
 
 module.exports = {
   getTasks,
