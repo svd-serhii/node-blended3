@@ -1,22 +1,14 @@
-const fs = require("fs/promises");
-
+const { Task } = require("../models/Task");
 const { HttpError } = require("../utils/HttpError");
 
-const crypto = require("crypto");
-
-const path = require("path");
-
-const db = path.join(process.cwd(), "db", "tasks.json");
-
-const getTasksService = async () => {
-  const rawData = await fs.readFile(db);
-  const parsedData = JSON.parse(rawData);
-  return parsedData;
+const getTasksService = async (page, limit) => {
+  const skip = (page - 1) * limit;
+  const tasks = await Task.find().skip(skip).limit(limit);
+  return tasks;
 };
 
 const getTaskService = async (taskId) => {
-  const tasks = await getTasksService();
-  const task = tasks.find((item) => String(item.id) === String(taskId));
+  const task = await Task.findById(taskId);
   if (!task) {
     throw new HttpError(404, "This task does not exist");
   }
@@ -24,39 +16,25 @@ const getTaskService = async (taskId) => {
 };
 
 const createTaskService = async (body) => {
-  const tasks = await getTasksService();
-  const newTask = {
-    id: crypto.randomUUID(),
-    title: body.title,
-    completed: body.completed,
-  };
-  tasks.push(newTask);
-  await fs.writeFile(db, JSON.stringify(tasks, null, 2));
+  const newTask = await Task.create(body);
   return newTask;
 };
 
 const updateTaskService = async (taskId, body) => {
-  const tasks = await getTasksService();
-  const task = tasks.find((item) => String(item.id) === String(taskId));
-  if (!task) {
+  const updatedTask = await Task.findByIdAndUpdate(taskId, body, { new: true });
+  if (!updatedTask) {
     throw new HttpError(404, "This task does not exist");
   }
-
-  task.title = body.title;
-  task.completed = body.completed;
-
-  await fs.writeFile(db, JSON.stringify(tasks, null, 2));
-  return task;
+  return updatedTask;
 };
 
 const deleteTaskService = async (taskId) => {
-  const tasks = await getTasksService();
-  const filteredTasks = tasks.filter((item) => String(item.id) !== String(taskId));
-  await fs.writeFile(db, JSON.stringify(filteredTasks, null, 2));
-  if (tasks.length === filteredTasks.length) {
+  const deletedTask = await Task.findByIdAndDelete(taskId);
+  if (!deletedTask) {
     throw new HttpError(404, "This task does not exist");
   }
-  return taskId;
+
+  return { id: taskId };
 };
 
 module.exports = {
